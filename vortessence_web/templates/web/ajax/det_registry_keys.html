@@ -1,0 +1,50 @@
+{% extends 'web/ajax/ajax_base.html' %}
+{% load formatter %}
+{% block content %}
+    <table style="width: 100%" class="tablesorter tablesorter-bootstrap">
+        <thead>
+        <tr>
+            <th class="filter-select" {% if filter_anomalies %}data-value="yes"{% endif %} >
+                Anomaly
+            </th>
+            <th>
+                Key
+            </th>
+            <th>
+                Hive
+            </th>
+            <th>
+                Last updated
+            </th>
+            <th>
+                Subkeys
+            </th>
+            <th>
+                Values
+            </th>
+        </tr>
+        </thead>
+        {% for reg in registry_keys %}
+            <tr>
+                <td>
+                    {{ reg.detregistry_set.all|yesno }}
+                </td>
+                <td>
+                    {{ reg.key }}
+                </td>
+                <td>
+                    {{ reg.hive }}
+                </td>
+                <td>
+                    {{ reg.last_updated }}
+                </td>
+                <td>
+                    {{ reg.subkeys|linebreaks }}
+                </td>
+                <td>
+                    {{ reg.values|linebreaks }}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

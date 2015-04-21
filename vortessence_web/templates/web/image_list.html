@@ -1,0 +1,196 @@
+{% extends 'web/base.html' %}
+
+{% block navbar %}
+{#    <li><a href="/">Overview</a></li>#}
+    <li class="active"><a href="/image/">Images</a></li>
+    <li><a href="/whitelist/">Whitelist</a></li>
+    <li><a href="/tools/">Tools</a></li>
+    <li><a href="/logout/">Logout</a></li>
+{% endblock %}
+
+{% block sidebar %}
+    <h4>Display Settings</h4>
+    <hr/>
+    <form action="/image_filter_whitelisted/" method="POST" id="image_details_disp_form">
+        {% csrf_token %}
+        <div class="input-group">
+            <label for="filter_whitelisted_images">Hide whitelisting images&nbsp;</label>
+            {{ form.filter_whitelisted_images }}
+        </div>
+        <br/>
+        <input type="submit" class="btn btn-sm btn-danger" value="Save"/>
+    </form>
+{% endblock %}
+
+{% block content %}
+    <h1 class="page-header">Image list</h1>
+
+
+
+    <table>
+        <thead>
+        <tr>
+            <td colspan="5">
+                <form id="image_search_form" class="navbar-form form-right" action="/image/" method="get">
+                    <input type="text" name="q" id="q" value="{{ search_value }}" class="form-control"
+                           placeholder="Search in ID, hostname, filename and description" style="width: 400px;"/>
+                    <button class="btn btn-primary" type="submit" value="submit">Search
+                    </button>
+                </form>
+            </td>
+            <td>
+                <div style="margin: 15px; text-align: right; font-weight: bold;">
+                    {{ page_obj.paginator.count }} Images found
+                </div>
+            </td>
+        </tr>
+        </thead>
+    </table>
+    <div>
+        {% if is_paginated %}
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li>
+                        <a href="?o={{ sort_by }}&ot={{ sort_mode_pag }}&q={{ search_value }}&page={{ page_obj.previous_page_number }}">&laquo;</a>
+                    </li>
+                {% else %}
+                    <li class="disabled"><a href="#">&laquo;</a></li>
+                {% endif %}
+
+                {% for page in page_obj.pages %}
+                    {% if page %}
+                        {% ifequal page page_obj.number %}
+                            <li class="active"><a href="#">{{ page }}<span class="sr-only">(current)</span></a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="?o={{ sort_by }}&ot={{ sort_mode_pag }}&q={{ search_value }}&page={{ page }}">{{ page }}</a>
+                            </li>
+                        {% endifequal %}
+                    {% else %}
+                        <li><span>...</span></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li>
+                        <a href="?o={{ sort_by }}&ot={{ sort_mode_pag }}&q={{ search_value }}&page={{ page_obj.next_page_number }}">&raquo;</a>
+                    </li>
+                {% else %}
+                    <li class="disabled"><a href="#">&raquo;</a></li>
+                {% endif %}
+            </ul>
+        {% endif %}
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>
+                    <a href="/image/?o=id&ot={{ sort_mode }}&q={{ search_value }}">ID</a>
+                    {% if sort_by == 'id' %}
+                        {% if sort_mode == 'asc' %}
+                            <span class="caret"></span>
+                        {% else %}
+                            <span class="up_caret"></span>
+                        {% endif %}
+                    {% endif %}
+                </th>
+                <th>
+                    <a href="/image/?o=hostname&ot={{ sort_mode }}&q={{ search_value }}">Hostname</a>
+                    {% if sort_by == 'hostname' %}
+                        {% if sort_mode == 'asc' %}
+                            <span class="caret"></span>
+                        {% else %}
+                            <span class="up_caret"></span>
+                        {% endif %}
+                    {% endif %}
+                </th>
+                <th>
+                    OS
+                </th>
+                <th>
+                    <a href="/image/?o=date&ot={{ sort_mode }}&q={{ search_value }}">Date</a>
+                    {% if sort_by == 'date' %}
+                        {% if sort_mode == 'asc' %}
+                            <span class="caret"></span>
+                        {% else %}
+                            <span class="up_caret"></span>
+                        {% endif %}
+                    {% endif %}
+                </th>
+                <th>
+                    <a href="/image/?o=status&ot={{ sort_mode }}&q={{ search_value }}">Status</a>
+                    {% if sort_by == 'status' %}
+                        {% if sort_mode == 'asc' %}
+                            <span class="caret"></span>
+                        {% else %}
+                            <span class="up_caret"></span>
+                        {% endif %}
+                    {% endif %}
+                </th>
+                <th>
+                    Description
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for snapshot in snapshot_list %}
+                <tr>
+                    <td><a href="/image/{{ snapshot.id }}">{{ snapshot.id }}</a></td>
+                    <td>{{ snapshot.hostname }}</td>
+                    <td>{{ snapshot.os }}</td>
+                    <td>{{ snapshot.date }}</td>
+                    <td>
+                        {% if snapshot.status == 1 %}Partially stored
+                        {% elif snapshot.status == 2 %}Stored
+                        {% elif snapshot.status == 3 %}Partially detected
+                        {% elif snapshot.status == 4 %}Detected
+                        {% elif snapshot.status == 5 %}Partially whitelisted
+                        {% elif snapshot.status == 6 %}Whitelisted
+                        {% else %}wip
+                        {% endif %}
+                    </td>
+                    <td>{{ snapshot.description }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        {% if is_paginated %}
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li>
+                        <a href="?o={{ sort_by }}&ot={{ sort_mode_pag }}&q={{ search_value }}&page={{ page_obj.previous_page_number }}">&laquo;</a>
+                    </li>
+                {% else %}
+                    <li class="disabled"><a href="#">&laquo;</a></li>
+                {% endif %}
+
+                {% for page in page_obj.pages %}
+                    {% if page %}
+                        {% ifequal page page_obj.number %}
+                            <li class="active"><a href="#">{{ page }}<span class="sr-only">(current)</span></a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="?o={{ sort_by }}&ot={{ sort_mode_pag }}&q={{ search_value }}&page={{ page }}">{{ page }}</a>
+                            </li>
+                        {% endifequal %}
+                    {% else %}
+                        <li><span>...</span></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li>
+                        <a href="?o={{ sort_by }}&ot={{ sort_mode_pag }}&q={{ search_value }}&page={{ page_obj.next_page_number }}">&raquo;</a>
+                    </li>
+                {% else %}
+                    <li class="disabled"><a href="#">&raquo;</a></li>
+                {% endif %}
+            </ul>
+        {% endif %}
+
+    </div>
+{% endblock %}

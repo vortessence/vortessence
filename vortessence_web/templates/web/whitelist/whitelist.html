@@ -1,0 +1,63 @@
+{% extends 'web/base.html' %}
+
+{% block title %}Whitelist overview{% endblock %}
+
+{% block navbar %}
+{#    <li><a href="/">Overview</a></li>#}
+    <li><a href="/image/">Images</a></li>
+    <li class="active"><a href="/whitelist/">Whitelist</a></li>
+    <li><a href="/tools/">Tools</a></li>
+    <li><a href="/logout/">Logout</a></li>
+{% endblock %}
+
+{% block sidebar %}
+    <ul class="nav nav-sidebar">
+        <li class="active"><a href="/whitelist">Overview</a></li>
+        <li><a href="/whitelist/processes">Processes</a></li>
+        <li><a href="/whitelist/callbacks">Callbacks</a></li>
+        <li><a href="/whitelist/drivers">Drivers</a></li>
+        <li><a href="/whitelist/files">Files</a></li>
+        <li><a href="/whitelist/gdts">GDTs</a></li>
+        <li><a href="/whitelist/idts">IDTs</a></li>
+        <li><a href="/whitelist/modules">Kernel modules</a></li>
+        <li><a href="/whitelist/unloadedmodules">unl. kernel modules</a></li>
+        <li><a href="/whitelist/registry">Registry</a></li>
+        <li><a href="/whitelist/services">Services</a></li>
+        <li><a href="/whitelist/ssdts">SSDTs</a></li>
+        <li><a href="/whitelist/timers">Timers</a></li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <h1 class="page-header">Whitelist overview</h1>
+
+    <div class="row row-offcanvas row-offcanvas-right">
+        <div class="col-xs-12 col-sm-9">
+            <div class="row">
+
+                {% for profile in stats %}
+                    <div class="col-xs-6 col-lg-4">
+                        <h4>{{ profile.name }}</h4>
+                        <ul>
+                            <li>Processes: {{ profile.processes }}</li>
+                            <li>Callbacks: {{ profile.callbacks }}</li>
+                            <li>Drivers: {{ profile.drivers }}</li>
+                            <li>Files: {{ profile.files }}</li>
+                            <li>GDTs: {{ profile.gdts }}</li>
+                            <li>IDTs: {{ profile.idts }}</li>
+                            <li>Kernel modules: {{ profile.modules }}</li>
+                            <li>Unl. kernel modules: {{ profile.unloaded_modules }}</li>
+                            <li>Registry keys: {{ profile.registry }}</li>
+                            <li>Services: {{ profile.services }}</li>
+                            <li>SSDTs: {{ profile.ssdts }}</li>
+                            <li>Timers: {{ profile.timers }}</li>
+                        </ul>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}

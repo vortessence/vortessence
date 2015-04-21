@@ -1,0 +1,44 @@
+{% extends 'web/ajax/ajax_base.html' %}
+{% load formatter %}
+{% block content %}
+    <table style="width: 100%" class="tablesorter tablesorter-bootstrap">
+        <thead>
+        <tr>
+            <th class="filter-select" {% if filter_anomalies %}data-value="yes"{% endif %} >
+                Anomaly
+            </th>
+            <th class="filter-select">
+                Type
+            </th>
+            <th>
+                Callback
+            </th>
+            <th>
+                Module
+            </th>
+            <th>
+                Details
+            </th>
+        </tr>
+        </thead>
+        {% for callback in callbacks %}
+            <tr>
+                <td>
+                    {{ callback.detcallback_set.all|yesno }}
+                </td>
+                <td>
+                    {{ callback.type }}
+                </td>
+                <td>
+                    {{ callback.callback|format_value:"[addr]" }}
+                </td>
+                <td>
+                    {{ callback.module }}
+                </td>
+                <td>
+                    {{ callback.details }}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

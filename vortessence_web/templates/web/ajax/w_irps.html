@@ -1,0 +1,20 @@
+{% load formatter %}
+<h4>
+    IRP calls for driver {{ wl_driver.name }}
+</h4>
+<table style="width: 100%;">
+    <thead>
+    <tr>
+        <th>
+            Name
+        </th>
+    </tr>
+    </thead>
+    {% for irp in wl_irps %}
+        <tr>
+            <td>
+                {{ irp.name }}
+            </td>
+        </tr>
+    {% endfor %}
+</table>

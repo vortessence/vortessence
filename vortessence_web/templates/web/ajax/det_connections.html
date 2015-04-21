@@ -1,0 +1,38 @@
+{% extends 'web/ajax/ajax_base.html' %}
+{% load formatter %}
+{% block content %}
+    <table style="width: 100%" class="tablesorter tablesorter-bootstrap">
+        <thead>
+        <tr>
+            <th class="filter-select" style="width: 10%" {% if filter_anomalies %}data-value="yes"{% endif %}>
+                Anomaly
+            </th>
+            <th>Offset (P)</th>
+            <th>Source port</th>
+            <th>Destination</th>
+            <th>Protocol</th>
+            <th>State</th>
+            <th>Time created</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for connection in connections %}
+            <tr>
+                <td>{{ connection.detconnection_set.all|yesno }}</td>
+                <td>
+                    {% if arch == "x86" %}
+                        {{ connection.offset|format_value:"[addrpad].Win7SP1x86" }}
+                    {% else %}
+                        {{ connection.offset|format_value:"[addrpad].Win7SP1x64" }}
+                    {% endif %}
+                </td>
+                <td>{{ connection.source_port }}</td>
+                <td>{{ connection.destination_ip }}:{{ connection.destination_port }}</td>
+                <td>{{ connection.protocol }}</td>
+                <td>{{ connection.state }}</td>
+                <td>{{ connection.time_created }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

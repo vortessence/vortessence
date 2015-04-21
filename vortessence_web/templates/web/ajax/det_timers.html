@@ -1,0 +1,46 @@
+{% extends 'web/ajax/ajax_base.html' %}
+{% load formatter %}
+{% block content %}
+    <table style="width: 100%;" class="tablesorter tablesorter-bootstrap">
+        <thead>
+        <tr>
+            <th class="filter-select" style="width: 7%" {% if filter_anomalies %}data-value="yes"{% endif %}>
+                Anomaly
+            </th>
+            <th>Offset</th>
+            <th>DueTime</th>
+            <th>Period(ms)</th>
+            <th class="filter-select" style="width: 7%">Signaled</th>
+            <th>Routine</th>
+            <th>Module</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for timer in timers %}
+            <tr>
+                <td>
+                    {{ timer.dettimer_set.all|yesno }}
+                </td>
+                <td>
+                    {% if arch == "x86" %}
+                        {{ timer.offset|format_value:"[addrpad].Win7SP1x86" }}
+                    {% else %}
+                        {{ timer.offset|format_value:"[addrpad].Win7SP1x64" }}
+                    {% endif %}
+                </td>
+                <td>{{ timer.due_time }}</td>
+                <td style="text-align: right">{{ timer.period }}</td>
+                <td style="text-align: center">{{ timer.signaled }}</td>
+                <td>
+                    {% if arch == "x86" %}
+                        {{ timer.routine|format_value:"[addrpad].Win7SP1x86" }}
+                    {% else %}
+                        {{ timer.routine|format_value:"[addrpad].Win7SP1x64" }}
+                    {% endif %}
+                </td>
+                <td>{{ timer.module }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

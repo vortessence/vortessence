@@ -1,0 +1,29 @@
+<table>
+    <tr>
+        <th>Path</th>
+        <td>{{ verinfo.module }}</td>
+    </tr>
+    <tr>
+        <th>File version</th>
+        <td>{{ verinfo.file_version }}</td>
+    </tr>
+    <tr>
+        <th>Product version</th>
+        <td>{{ verinfo.flags }}</td>
+    </tr>
+    <tr>
+        <th>Flags</th>
+        <td>{{ verinfo.os }}</td>
+    </tr>
+    <tr>
+        <th>File type</th>
+        <td>{{ verinfo.file_type }}</td>
+    </tr>
+    <tr>
+        <th>File date</th>
+        <td>{{ verinfo.file_date }}</td>
+    </tr>
+    <tr>
+        <td colspan="2">{{ verinfo.info_string|linebreaksbr }}</td>
+    </tr>
+</table>

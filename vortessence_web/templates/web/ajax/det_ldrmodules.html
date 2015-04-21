@@ -1,0 +1,63 @@
+{% extends 'web/ajax/ajax_base.html' %}
+{% load formatter %}
+{% block content %}
+    <table style="width: 100%" class="tablesorter tablesorter-bootstrap">
+        <thead>
+        <tr>
+            <th class="filter-select" style="width: 10%" {% if filter_anomalies %}data-value="yes"{% endif %}>
+                Anomaly
+            </th>
+            <th style="width: 20%">Base</th>
+            <th style="width: 40%">Mapped path</th>
+            <th style="width: 10%">InLoad</th>
+            <th style="width: 10%">InInit</th>
+            <th style="width: 10%">InMem</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for ldrmodule in ldrmodules %}
+            <tr>
+                <td>{{ ldrmodule.detldrmodule_set.all|yesno }}</td>
+                <td>
+                    {% if arch == "x86" %}
+                        {{ ldrmodule.base|format_value:"[addrpad].Win7SP1x86" }}
+                    {% else %}
+                        {{ ldrmodule.base|format_value:"[addrpad].Win7SP1x64" }}
+                    {% endif %}
+                </td>
+                <td>{{ ldrmodule.mapped_path }}</td>
+                <td>{{ ldrmodule.inload }}</td>
+                <td>{{ ldrmodule.ininit }}</td>
+                <td>{{ ldrmodule.inmem }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="mui-info-modal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Hidden .MUI files</h4>
+                </div>
+                <div class="modal-body" id="mui-info-body">
+                    .MUI files are Multilingual User Interface files, which contains user interface text information for
+                    specific languages. <a
+                        href="http://file.fyicenter.com/110_Windows_.MUI_File_Extension_for_Multilingual_User_Interfac.html"
+                        target="_blank">More info</a><br/>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr/>
+{% endblock %}

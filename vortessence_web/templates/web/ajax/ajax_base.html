@@ -1,0 +1,17 @@
+{% load static %}
+<script src="{% static 'js/jquery-2.1.0.min.js' %}"></script>
+<script src="{% static 'js/jquery.tablesorter.min.js' %}"></script>
+<script src="{% static 'js/jquery.tablesorter.widgets.min.js' %}"></script>
+<script src="{% static 'js/jquery.tablesorter.widgets-filter-formatter.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+{% block content %}{% endblock %}
+<script type="text/javascript">
+    $('.tablesorter').tablesorter({
+        theme: 'bootstrap',
+        widgets: ["filter"],
+        widgetOptions: {
+            filter_searchDelay: 300,
+            cssChildRow: "tablesorter-childRow"
+        }
+    });
+</script>

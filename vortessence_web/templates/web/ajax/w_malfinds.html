@@ -1,0 +1,20 @@
+{% extends 'web/ajax/ajax_base.html' %}
+{% load formatter %}
+{% block content %}
+    <table style="max-width: 800px;" class="tablesorter tablesorter-bootstrap">
+        <thead>
+        <tr>
+            <th>Size</th>
+            <th>Occurences</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for vad in wl_vad %}
+            <tr>
+                <td>{{ vad.size|format_value:"[addr]" }}</td>
+                <td>{{ vad.min }} - {{ vad.max }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

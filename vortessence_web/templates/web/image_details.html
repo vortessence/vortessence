@@ -1,0 +1,489 @@
+{% extends 'web/base.html' %}
+{% load formatter %}
+{% block sidebar %}
+    <h4>Display Settings</h4>
+    <hr/>
+    <form action="/image_detail_display/{{ snapshot.id }}/" method="POST" id="image_details_disp_form">
+        {% csrf_token %}
+        <div class="input-group">
+            <label for="filter_anomalies">Filter for anomalies&nbsp;</label>
+            {{ display_form.filter_anomalies }}
+        </div>
+        <br/>
+        <input type="submit" class="btn btn-sm btn-danger" value="Save"/>
+    </form>
+{% endblock %}
+{% block navbar %}
+{#    <li><a href="/">Overview</a></li>#}
+    <li class="active"><a href="/image/">Images</a></li>
+    <li><a href="/whitelist/">Whitelist</a></li>
+    <li><a href="/tools/">Tools</a></li>
+    <li><a href="/logout/">Logout</a></li>
+{% endblock %}
+{% block content %}
+    <h1 class="page-header">Image details</h1>
+    <div class="table-responsive col-9">
+        <table class="table table-striped table-bordered" style="width: 100%">
+            <tr>
+                <th>ID</th>
+                <td>{{ snapshot.id }}</td>
+            </tr>
+            <tr>
+                <th>OS</th>
+                <td>{{ snapshot.os }}</td>
+            </tr>
+            <tr>
+                <th>Volatility profile</th>
+                <td>{{ snapshot.profile.name }}</td>
+            </tr>
+            <tr>
+                <th>Hostname</th>
+                <td>{{ snapshot.hostname }}</td>
+            </tr>
+            <tr>
+                <th>Boot time</th>
+                <td>{{ boot_time }}</td>
+            </tr>
+            <tr>
+                <th>Image time</th>
+                <td>{{ snapshot.date }}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>
+                    {% if snapshot.status == 1 %}Partially stored
+                        {% elif snapshot.status == 2 %}Stored
+                        {% elif snapshot.status == 3 %}Partially detected
+                        {% elif snapshot.status == 4 %}Detected
+                        {% elif snapshot.status == 5 %}Partially whitelisted
+                        {% elif snapshot.status == 6 %}Whitelisted
+                    {% else %}wip
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th>Filename</th>
+                <td>{{ snapshot.filename }}</td>
+            </tr>
+            <tr>
+                <th>Comment</th>
+                <td>
+                    <p id="desc_p">
+                        {{ snapshot.description }}
+                    </p>
+
+                    <button type="button" class="btn btn-sm btn-danger" id="image_edit" style="float: right"><i
+                            class="fa fa-pencil fa-lg"></i>&nbsp;Edit
+                    </button>
+                    <form action="/image/{{ snapshot.id }}/" method="POST" style="display: none" id="desc_form">
+                        {% csrf_token %}
+                        {{ form.non_field_errors }}
+                        <div class="fieldWrapper">
+                            {{ form.description.errors }}
+                            {{ form.description }}
+                        </div>
+                        <input type="submit" value="Save"/>
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <h2 style="clear: both;">Process results</h2>
+    <div class="row">
+    <div class="col-9">
+    <ul class="list-group">
+    {% for pr in result_set.process_results %}
+        <li class="list-group-item">
+        <div style="width: 25%; float: left">
+            {% if pr.has_anomaly %}
+                <i style="font-size: 30px; font-weight: bolder; line-height: 12px; color: red">&times;</i>&nbsp;
+            {% elif pr.has_weak_anomaly %}
+                <i style="color: #808080" class="fa fa-question fa-lg"></i>&nbsp;
+            {% else %}
+                <i class="fa fa-check fa-lg" style="color: green"></i>
+            {% endif %}
+            <a href="#" class="showdetails"
+               id="l{{ pr.process.id }}"><strong>{{ pr.process.pid }} {{ pr.process.name }}</strong></a></div>
+        &nbsp;&nbsp;&nbsp;&nbsp;{{ pr.process.creation_time }}{% if pr.process.exit_time %} -
+            {{ pr.process.exit_time }}{% endif %}
+        {% if pr.has_anomaly or pr.has_weak_anomaly %}
+            <div style="float: left; clear: right; width: 180pt;">
+                {% if pr.det_dlls or pr.unknown_number_of_dlls %}
+                    <span class="label label-danger" title="DLL anomalies">D</span>
+                {% endif %}
+                {% if pr.det_ldrmodules %}
+                    <span class="label label-danger" title="Loader module anomalies">L</span>
+                {% endif %}
+                {% if pr.det_connections or pr.network_anomaly %}
+                    <span class="label label-danger" title="Connection anomalies">C</span>
+                {% endif %}
+                {% if pr.det_sids %}
+                    <span class="label label-danger" title="SID anomalies">S</span>
+                {% endif %}
+                {% if pr.det_handles %}
+                    <span class="label label-warning" title="Handle anomalies">H</span>
+                {% endif %}
+                {% if pr.det_apihooks %}
+                    <span class="label label-warning" title="Apihook anomalies">A</span>
+                {% endif %}
+                {% if pr.malfind_true_positives %}
+                    <span class="label label-danger" title="Malfind anomalies">M</span>
+                {% endif %}
+                {% if pr.unknown_process %}
+                    <span class="label label-default" title="Unknown process">U</span>
+                {% endif %}
+                {% if pr.unknown_command_line %}
+                    <span class="label label-warning" title="Unknown command line">Cl</span>
+                {% endif %}
+                {% if pr.unknown_parent %}
+                    <span class="label label-danger" title="Unknown parent">Pa</span>
+                {% endif %}
+                {% if pr.unknown_number_of_threads %}
+                    <span class="label label-default" title="Unknown number of threads">T</span>
+                {% endif %}
+                {% if pr.prio_anomaly %}
+                    <span class="label label-warning" title="Unknown base priorities">Pr</span>
+                {% endif %}
+                {% if pr.unknown_number_of_the_same %}
+                    <span class="label label-danger" title="Unknown number of instances">#</span>
+                {% endif %}
+            </div>
+        {% else %}
+            <div style="float: left; clear: right; width: 180pt;">&nbsp;</div>
+        {% endif %}
+
+        <div style="display:none; margin-top: 20px;">
+            <div class="tabbable">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#tab_det_{{ pr.process.pid }}" data-toggle="tab">Details</a></li>
+                    <li>
+                        <a href="#tab_dll_{{ pr.process.pid }}" data-toggle="tab" value="{{ pr.process.id }}"
+                           class="ajax-link"
+                           view="det_dlls">{% if pr.det_dlls %}<strong style="color:red">
+                            DLLs ({{ pr.det_dlls }}/{{ pr.dlls }})</strong>{% else %}
+                            DLLs ({{ pr.dlls }}){% endif %}</a>
+                    </li>
+                    <li>
+                        <a href="#tab_ldrm_{{ pr.process.pid }}" data-toggle="tab" value="{{ pr.process.id }}"
+                           class="ajax-link" view="det_ldrmodules">{% if pr.det_ldrmodules %}
+                            <strong style="color:red">
+                                Ldrmodules ({{ pr.det_ldrmodules }}/{{ pr.ldrmodules }})</strong>{% else %}
+                            Ldrmodules ({{ pr.ldrmodules }}){% endif %}</a>
+                    </li>
+                    <li>
+                        <a href="#tab_hndl_{{ pr.process.pid }}" data-toggle="tab" value="{{ pr.process.id }}"
+                           class="ajax-link" view="det_handles">{% if pr.det_handles %}<strong style="color:red">
+                            Handles ({{ pr.det_handles }}/{{ pr.handles }})</strong>{% else %}
+                            Handles ({{ pr.handles }}){% endif %}</a>
+                    </li>
+                    <li><a href="#tab_sid_{{ pr.process.pid }}" data-toggle="tab" value="{{ pr.process.id }}"
+                           class="ajax-link"
+                           view="det_sids">{% if pr.det_sids %}<strong style="color:red">
+                        SIDs ({{ pr.det_sids }}/{{ pr.sids }})</strong>{% else %}
+                        SIDs ({{ pr.sids }}){% endif %}</a></li>
+                    <li><a href="#tab_connection_{{ pr.process.pid }}" data-toggle="tab" value="{{ pr.process.id }}"
+                           class="ajax-link"
+                           view="det_connections">{% if pr.det_connections %}<strong style="color:red">
+                        Connections ({{ pr.det_connections }}/{{ pr.connections }})</strong>{% else %}
+                        Connections ({{ pr.connections }}){% endif %}</a></li>
+                    {% if pr.malfind_true_positives or pr.malfind_false_positives %}
+                        <li><a href="#tab_malfind_{{ pr.process.pid }}" data-toggle="tab" view="det_malfinds"
+                               class="ajax-link" value="{{ pr.process.id }}">
+                            {% if pr.malfind_true_positives %}<strong style="color:red">
+                                Malfind
+                                ({{ pr.malfind_true_positives }}/{{ pr.malfind_false_positives }})
+                                </strong>{% else %}
+                                Malfind ({{ pr.malfind_false_positives }}){% endif %}
+                        </a></li>
+                    {% endif %}
+                    {% if pr.apihooks %}
+                        <li><a href="#tab_apihook_{{ pr.process.pid }}" data-toggle="tab" view="det_apihooks"
+                               class="ajax-link"
+                               value="{{ pr.process.id }}">
+                            {% if pr.det_apihooks %}
+                                <strong style="color:red">
+                                    API hooks ({{ pr.det_apihooks }}/{{ pr.apihooks }})
+                                </strong>
+                            {% else %}
+                                API hooks ({{ pr.apihooks }})
+                            {% endif %}
+                        </a></li>
+                    {% endif %}
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_det_{{ pr.process.pid }}">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>Base</th>
+                                <td>
+                                    {% if arch == "x86" %}
+                                        {{ pr.process.offset|format_value:"[addrpad].Win7SP1x86" }}
+                                    {% else %}
+                                        {{ pr.process.offset|format_value:"[addrpad].Win7SP1x64" }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Path</th>
+                                <td>
+                                    {% if pr.unknown_process > 0 %}
+                                        <strong style="color: red">{{ pr.process.path }}</strong>
+                                    {% else %}
+                                        {{ pr.process.path }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Command line</th>
+                                <td>
+                                    {% if pr.unknown_command_line %}
+                                        <strong style="color:red">{{ pr.process.command_line }}</strong>
+                                        &nbsp;&nbsp;
+                                        <button type="button" class="btn btn-success btn-xs load-ajax-modal-btn"
+                                                value="{{ pr.process.id }}"
+                                                view="w_process_cl">
+                                            <i class="fa fa-check-square-o"></i>&nbsp;Whitelist
+                                        </button>
+                                    {% else %}
+                                        {{ pr.process.command_line }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Parent Process</th>
+                                <td>
+                                    {% if pr.unknown_parent %}
+                                        <strong style="color:red">{{ pr.parent_process.pid }}&nbsp;&nbsp;{{ pr.parent_process.name }}</strong>
+                                        &nbsp;&nbsp;
+                                        <button type="button" class="btn btn-success btn-xs load-ajax-modal-btn"
+                                                value="{{ pr.process.id }}"
+                                                view="w_process_parent">
+                                            <i class="fa fa-check-square-o"></i>&nbsp;Whitelist
+                                        </button>
+                                    {% else %}
+                                        {{ pr.parent_process.pid }}&nbsp;&nbsp;{{ pr.parent_process.name }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% if pr.unknown_number_of_the_same > 0 %}
+                                <tr>
+                                    <th>
+                                        # of instances
+                                    </th>
+                                    <td><strong
+                                            style="color: red">{{ pr.unknown_number_of_the_same }}</strong>
+                                        {% if pr.wl_process %}&nbsp;&nbsp;|&nbsp;&nbsp;
+                                            <strong style="color: green">{{ pr.wl_process.nr }}</strong>{% endif %}
+                                    </td>
+                                </tr>
+                            {% endif %}
+                            <tr>
+                                <th># Threads</th>
+                                <td>
+                                    {% if pr.unknown_number_of_threads > 0 %}
+                                        <strong
+                                                style="color: red">{{ pr.unknown_number_of_threads }}</strong>
+                                        {% if pr.wl_process %}&nbsp;&nbsp;|&nbsp;&nbsp;
+                                            <strong style="color: green">{{ pr.wl_process.thread_min }}
+                                                - {{ pr.wl_process.thread_max }}</strong>{% endif %}
+                                    {% else %}
+                                        {{ pr.process.threads }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Network activity</th>
+                                <td>
+                                    {% if pr.network_anomaly %}
+                                        <strong style="color: red">Yes</strong>
+                                        {% if pr.wl_process %}&nbsp;&nbsp;|&nbsp;&nbsp;
+                                            <strong style="color: green">No</strong>{% endif %}
+                                    {% else %}
+                                        {{ pr.connections|yesno }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th># DLLs</th>
+                                <td>
+                                    {% if pr.unknown_number_of_dlls %}
+                                        <strong
+                                                style="color: red">{{ pr.unknown_number_of_dlls }}</strong>
+                                        {% if pr.wl_process %}&nbsp;&nbsp;|&nbsp;&nbsp;
+                                            <strong style="color: green">{{ pr.wl_process.dll_min }}
+                                                - {{ pr.wl_process.dll_max }}</strong>{% endif %}
+                                    {% else %}
+                                        {{ pr.dlls }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Base priorities</th>
+                                <td>
+                                    {% if pr.prio_anomaly %}
+                                        <strong style="color: red">
+                                            {% for prio in pr.priorities %}{{ prio }}&nbsp;&nbsp;&nbsp;{% endfor %}
+                                        </strong>|&nbsp;&nbsp;
+                                        <strong style="color: green">
+                                            {% for prio in pr.wl_prios %}
+                                                {{ prio.prio }}&nbsp;&nbsp;&nbsp;
+                                            {% endfor %}
+                                        </strong>
+                                    {% else %}
+                                        {% for prio in pr.priorities %}{{ prio }}&nbsp;&nbsp;&nbsp;{% endfor %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+
+                    </div>
+                    <div class="tab-pane" id="tab_dll_{{ pr.process.pid }}"></div>
+                    <div class="tab-pane" id="tab_ldrm_{{ pr.process.pid }}"></div>
+                    <div class="tab-pane" id="tab_hndl_{{ pr.process.pid }}"></div>
+                    <div class="tab-pane" id="tab_sid_{{ pr.process.pid }}"></div>
+                    <div class="tab-pane" id="tab_connection_{{ pr.process.pid }}"></div>
+                    <div class="tab-pane" id="tab_apihook_{{ pr.process.pid }}"></div>
+                    <div class="tab-pane" id="tab_malfind_{{ pr.process.pid }}"></div>
+                </div>
+            </div>
+        </li>
+    {% endfor %}
+    </ul>
+    </div>
+    </div>
+
+    <h2>System results</h2>
+    <div class="row">
+        <div class="col-9">
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <a href="#" class="load_det_results" value="{{ snapshot.id }}"
+                       view="det_registry_keys"><strong>{{ result_set.registry_keys }}
+                        Registry entries
+                        {% if result_set.det_registry_keys %}
+                            <span style="color: red">&nbsp;&nbsp;{{ result_set.det_registry_keys }} anomalies</span>
+                        {% endif %}</strong></a>
+
+                    <div></div>
+                </li>
+                <li class="list-group-item">
+                    <a href="#" class="load_det_results" value="{{ snapshot.id }}"
+                       view="det_modscans"><strong>{{ result_set.modscans }}
+                        Modules
+                        {% if result_set.det_modscans %}
+                            <span style="color: red">&nbsp;&nbsp;{{ result_set.det_modscans }} anomalies</span>
+                        {% endif %}</strong></a>
+
+                    <div></div>
+                </li>
+                <li class="list-group-item">
+                    <a href="#" class="load_det_results" value="{{ snapshot.id }}"
+                       view="det_callbacks"><strong>{{ result_set.callbacks }}
+                        Callbacks
+                        {% if result_set.det_callbacks %}
+                            <span style="color: red">&nbsp;&nbsp;{{ result_set.det_callbacks }} anomalies</span>
+                        {% endif %}</strong></a>
+
+                    <div></div>
+                </li>
+                <li class="list-group-item">
+                    <a href="#" class="load_det_results" value="{{ snapshot.id }}"
+                       view="det_drivers"><strong>{{ result_set.drivers }}
+                        Drivers
+                        {% if result_set.det_drivers %}
+                            <span style="color: red">&nbsp;&nbsp;{{ result_set.det_drivers }} anomalies</span>
+                        {% endif %}</strong></a>
+
+                    <div></div>
+                </li>
+                <li class="list-group-item">
+                    <a href="#" class="load_det_results" value="{{ snapshot.id }}"
+                       view="det_unloaded_modules"><strong>{{ result_set.unloaded_modules }}
+                        Unloaded modules
+                        {% if result_set.det_unloaded_modules %}
+                            <span style="color: red">&nbsp;&nbsp;{{ result_set.det_unloaded_modules }} anomalies</span>
+                        {% endif %}</strong></a>
+
+                    <div></div>
+                </li>
+                <li class="list-group-item">
+                    <a href="#" class="load_det_results" value="{{ snapshot.id }}"
+                       view="det_timers"><strong>{{ result_set.timers }}
+                        Timers
+                        {% if result_set.det_timers %}
+                            <span style="color: red">&nbsp;&nbsp;{{ result_set.det_timers }} anomalies</span>
+                        {% endif %}</strong></a>
+
+                    <div></div>
+                </li>
+                <li class="list-group-item">
+                    <a href="#" class="load_det_results" value="{{ snapshot.id }}"
+                       view="det_gdts"><strong>{{ result_set.gdts }}
+                        GDTs
+                        {% if result_set.det_gdts %}
+                            <span style="color: red">&nbsp;&nbsp;{{ result_set.det_gdts }} anomalies</span>
+                        {% endif %}</strong></a>
+
+                    <div></div>
+                </li>
+                <li class="list-group-item">
+                    <a href="#" class="load_det_results" value="{{ snapshot.id }}"
+                       view="det_idts"><strong>{{ result_set.idts }} IDTs
+                        {% if result_set.det_idts %}
+                            <span style="color: red">&nbsp;&nbsp;{{ result_set.det_idts }} anomalies</span>
+                        {% endif %}
+                    </strong></a>
+
+                    <div></div>
+                </li>
+                <li class="list-group-item">
+                    <a href="#" class="load_det_results" value="{{ snapshot.id }}"
+                       view="det_files"><strong>{{ result_set.files }}
+                        File objects
+                        {% if result_set.det_files %}
+                            <span style="color: red">&nbsp;&nbsp;{{ result_set.det_files }} anomalies</span>
+                        {% endif %}
+                    </strong></a>
+
+                    <div></div>
+                </li>
+                <li class="list-group-item">
+                    <a href="#" class="load_det_results" value="{{ snapshot.id }}"
+                       view="det_servies"><strong>{{ result_set.services }}
+                        Services
+                        {% if result_set.det_services %}
+                            <span style="color: red">&nbsp;&nbsp;{{ result_set.det_services }} anomalies</span>
+                        {% endif %}
+                    </strong></a>
+
+                    <div></div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="modal fade" id="wl_modal" tabindex="-1"
+         role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width: 1200px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body" id="wl_modal_body">
+                    Loading ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default"
+                            data-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

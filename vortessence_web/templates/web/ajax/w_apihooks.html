@@ -1,0 +1,19 @@
+{% extends 'web/ajax/ajax_base.html' %}
+{% block content %}
+    <table style="width: 100%;" class="tablesorter tablesorter-bootstrap">
+        <thead>
+        <tr>
+            <th style="width: 40%;">DLL</th>
+            <th>Function</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for apihook in wl_apihooks %}
+            <tr>
+                <td>{{ apihook.dll_path }}</td>
+                <td>{{ apihook.function }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

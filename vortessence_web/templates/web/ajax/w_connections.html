@@ -1,0 +1,25 @@
+{% extends 'web/ajax/ajax_base.html' %}
+{% block content %}
+    <table style="width: 100%; background-color: white; padding: 5px;" class="tablesorter tablesorter-bootstrap">
+        <thead>
+        <tr>
+            <th>Source port</th>
+            <th>Destination IP</th>
+            <th>Destination port</th>
+            <th class="filter-select" >Protocol</th>
+            <th class="filter-select" >State</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for connection in wl_connections %}
+            <tr>
+                <td>{{ connection.source_port }}</td>
+                <td>{{ connection.destination_ip }}</td>
+                <td>{{ connection.destination_port }}</td>
+                <td>{{ connection.protocol }}</td>
+                <td>{{ connection.state }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,235 @@
+{% extends 'web/base.html' %}
+
+{% block title %}Driver whitelist{% endblock %}
+
+{% block navbar %}
+{#    <li><a href="/">Overview</a></li>#}
+    <li><a href="/image/">Images</a></li>
+    <li class="active"><a href="/whitelist/">Whitelist</a></li>
+    <li><a href="/tools/">Tools</a></li>
+    <li><a href="/logout/">Logout</a></li>
+{% endblock %}
+
+{% block sidebar %}
+    <ul class="nav nav-sidebar">
+        <li><a href="/whitelist">Overview</a></li>
+        <li><a href="/whitelist/processes">Processes</a></li>
+        <li><a href="/whitelist/callbacks">Callbacks</a></li>
+        <li class="active"><a href="/whitelist/drivers">Drivers</a></li>
+        <li><a href="/whitelist/files">Files</a></li>
+        <li><a href="/whitelist/gdts">GDTs</a></li>
+        <li><a href="/whitelist/idts">IDTs</a></li>
+        <li><a href="/whitelist/modules">Kernel modules</a></li>
+        <li><a href="/whitelist/unloadedmodules">unl. kernel modules</a></li>
+        <li><a href="/whitelist/registry">Registry</a></li>
+        <li><a href="/whitelist/services">Services</a></li>
+        <li><a href="/whitelist/ssdts">SSDTs</a></li>
+        <li><a href="/whitelist/timers">Timers</a></li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <div class="modal fade" id="det_driver_modal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width: 1200px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body" id="det_driver_body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <h1 class="page-header">Driver whitelist</h1>
+    <table>
+        <thead>
+        <tr>
+            <td style="width: 60%">
+                <form id="wl_driver_search_form" class="navbar-form form-right" action="/whitelist/drivers/"
+                      method="get">
+                    <input type="text" name="q" id="q" value="{{ search_value }}" class="form-control"
+                           placeholder="Search in driver, device, type and profile" style="width: 400px;"/>
+                    <button class="btn btn-primary" type="submit" value="submit">Search
+                    </button>
+                </form>
+            </td>
+            <td style="width: 40%">
+                <div style="margin: 15px; text-align: right; font-weight: bold;">
+                    {{ page_obj.paginator.count }} Devices found
+                </div>
+            </td>
+        </tr>
+        </thead>
+    </table>
+    <div>
+        {% if is_paginated %}
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li>
+                        <a href="?o={{ sort_by }}&ot={{ sort_mode_pag }}&q={{ search_value }}&page={{ page_obj.previous_page_number }}">&laquo;</a>
+                    </li>
+                {% else %}
+                    <li class="disabled"><a href="#">&laquo;</a></li>
+                {% endif %}
+
+                {% for page in page_obj.pages %}
+                    {% if page %}
+                        {% ifequal page page_obj.number %}
+                            <li class="active"><a href="#">{{ page }}<span class="sr-only">(current)</span></a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="?o={{ sort_by }}&ot={{ sort_mode_pag }}&q={{ search_value }}&page={{ page }}">{{ page }}</a>
+                            </li>
+                        {% endifequal %}
+                    {% else %}
+                        <li><span>...</span></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li>
+                        <a href="?o={{ sort_by }}&ot={{ sort_mode_pag }}&q={{ search_value }}&page={{ page_obj.next_page_number }}">&raquo;</a>
+                    </li>
+                {% else %}
+                    <li class="disabled"><a href="#">&raquo;</a></li>
+                {% endif %}
+            </ul>
+        {% endif %}
+    </div>
+
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th style="width: 35%">
+                    <a href="/whitelist/drivers/?o=wl_driver__name&ot={{ sort_mode }}&q={{ search_value }}">Driver
+                        name</a>
+                    {% if sort_by == 'wl_driver__name' %}
+                        {% if sort_mode == 'asc' %}
+                            <span class="caret"></span>
+                        {% else %}
+                            <span class="up_caret"></span>
+                        {% endif %}
+                    {% endif %}
+                </th>
+                <th style="width: 35%">
+                    <a href="/whitelist/drivers/?o=name&ot={{ sort_mode }}&q={{ search_value }}">Dev name</a>
+                    {% if sort_by == 'name' %}
+                        {% if sort_mode == 'asc' %}
+                            <span class="caret"></span>
+                        {% else %}
+                            <span class="up_caret"></span>
+                        {% endif %}
+                    {% endif %}
+                </th>
+                <th style="width: 15%">
+                    <a href="/whitelist/drivers/?o=type&ot={{ sort_mode }}&q={{ search_value }}">Dev type</a>
+                    {% if sort_by == 'type' %}
+                        {% if sort_mode == 'asc' %}
+                            <span class="caret"></span>
+                        {% else %}
+                            <span class="up_caret"></span>
+                        {% endif %}
+                    {% endif %}
+                </th>
+                <th style="width: 15%">
+                    <a href="/whitelist/drivers/?o=is_attached&ot={{ sort_mode }}&q={{ search_value }}">Is attached</a>
+                    {% if sort_by == 'is_attached' %}
+                        {% if sort_mode == 'asc' %}
+                            <span class="caret"></span>
+                        {% else %}
+                            <span class="up_caret"></span>
+                        {% endif %}
+                    {% endif %}
+                </th>
+                <th style="width: 15%">
+                    <a href="/whitelist/drivers/?o=profile&ot={{ sort_mode }}&q={{ search_value }}">Profile</a>
+                    {% if sort_by == 'profile' %}
+                        {% if sort_mode == 'asc' %}
+                            <span class="caret"></span>
+                        {% else %}
+                            <span class="up_caret"></span>
+                        {% endif %}
+                    {% endif %}
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for device in wldevice_list %}
+                <tr>
+                    <td>
+                        <a href="#" class="load_det_modal" view="w_irps"
+                           value="{{ device.wl_driver.id }}">{{ device.wl_driver.name }}</a>
+                    </td>
+                    <td>{{ device.name }}</td>
+                    <td>{{ device.type }}</td>
+                    <td>{{ device.is_attached }}</td>
+                    <td>{{ device.wl_driver.profile.name }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% if is_paginated %}
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li>
+                        <a href="?o={{ sort_by }}&ot={{ sort_mode_pag }}&q={{ search_value }}&page={{ page_obj.previous_page_number }}">&laquo;</a>
+                    </li>
+                {% else %}
+                    <li class="disabled"><a href="#">&laquo;</a></li>
+                {% endif %}
+
+                {% for page in page_obj.pages %}
+                    {% if page %}
+                        {% ifequal page page_obj.number %}
+                            <li class="active"><a href="#">{{ page }}<span class="sr-only">(current)</span></a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="?o={{ sort_by }}&ot={{ sort_mode_pag }}&q={{ search_value }}&page={{ page }}">{{ page }}</a>
+                            </li>
+                        {% endifequal %}
+                    {% else %}
+                        <li><span>...</span></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li>
+                        <a href="?o={{ sort_by }}&ot={{ sort_mode_pag }}&q={{ search_value }}&page={{ page_obj.next_page_number }}">&raquo;</a>
+                    </li>
+                {% else %}
+                    <li class="disabled"><a href="#">&raquo;</a></li>
+                {% endif %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".load_det_modal").click(function (event) {
+                event.preventDefault();
+                var elem_id;
+                var view;
+                elem_id = $(this).attr("value");
+                view = $(this).attr("view");
+                var link = $(this);
+                $('#det_driver_body').html("Loading...")
+                $('#det_driver_body').load('/ajax/' + view + '/' + elem_id, function (result) {
+                    $('#det_driver_modal').modal({show: true});
+                });
+            })
+        });
+    </script>
+
+{% endblock %}

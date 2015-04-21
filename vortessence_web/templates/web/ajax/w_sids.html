@@ -1,0 +1,17 @@
+{% extends 'web/ajax/ajax_base.html' %}
+{% block content %}
+    <table style="max-width: 800px" class="tablesorter tablesorter-bootstrap">
+        <thead>
+        <tr>
+            <th>Name</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for sid in wl_sids %}
+            <tr>
+                <td>{{ sid.name }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

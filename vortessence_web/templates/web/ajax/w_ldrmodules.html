@@ -1,0 +1,23 @@
+{% extends 'web/ajax/ajax_base.html' %}
+{% block content %}
+    <table style="width: 100%" class="tablesorter tablesorter-bootstrap">
+        <thead>
+        <tr>
+            <th>Mapped path</th>
+            <th>Init path</th>
+            <th>Mem path</th>
+            <th>Load path</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for ldr in wl_ldrmodules %}
+            <tr>
+                <td>{{ ldr.mapped_path }}</td>
+                <td>{{ ldr.init_path }}</td>
+                <td>{{ ldr.mem_path }}</td>
+                <td>{{ ldr.load_path }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

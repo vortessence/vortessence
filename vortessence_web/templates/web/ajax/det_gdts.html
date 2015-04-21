@@ -1,0 +1,70 @@
+{% extends 'web/ajax/ajax_base.html' %}
+{% load formatter %}
+{% block content %}
+    <table style="width: 100%" class="tablesorter tablesorter-bootstrap">
+        <thead>
+        <tr>
+            <th class="filter-select" {% if filter_anomalies %}data-value="yes"{% endif %} >
+                Anomaly
+            </th>
+            <th>
+                Selector
+            </th>
+            <th>
+                Base
+            </th>
+            <th>
+                Limit
+            </th>
+            <th class="filter-select">
+                Type
+            </th>
+            <th class="filter-select">
+                Descriptor privilege level
+            </th>
+            <th class="filter-select">
+                Granularity
+            </th>
+            <th class="filter-select">
+                Priority
+            </th>
+        </tr>
+        </thead>
+        {% for gdt in gdts %}
+            <tr>
+                <td>
+                    {{ gdt.detgdt_set.all|yesno }}
+                </td>
+                <td>
+                    {{ gdt.sel|format_value:"[addr]" }}
+                </td>
+                <td>
+                    {% if arch == "x86" %}
+                        {{ gdt.base|format_value:"[addrpad].Win7SP1x86" }}
+                    {% else %}
+                        {{ gdt.base|format_value:"[addrpad].Win7SP1x64" }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if arch == "x86" %}
+                        {{ gdt.limit|format_value:"[addrpad].Win7SP1x86" }}
+                    {% else %}
+                        {{ gdt.limit|format_value:"[addrpad].Win7SP1x64" }}
+                    {% endif %}
+                </td>
+                <td>
+                    {{ gdt.type }}
+                </td>
+                <td>
+                    {{ gdt.dpl }}
+                </td>
+                <td>
+                    {{ gdt.gr }}
+                </td>
+                <td>
+                    {{ gdt.pr }}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

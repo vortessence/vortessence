@@ -1,0 +1,42 @@
+{% load formatter %}
+<h4>
+    IRP calls for driver {{ driver.name }}
+</h4>
+<table style="width: 100%;">
+    <thead>
+    <tr>
+        <th class="filter-select" {% if filter_anomalies %}data-value="yes"{% endif %} >
+            Anomaly
+        </th>
+        <th>
+            Name
+        </th>
+        <th>
+            Base DLL
+        </th>
+        <th>
+            Start
+        </th>
+    </tr>
+    </thead>
+    {% for irp in irps %}
+        <tr>
+            <td>
+                {{ irp.detirpcall_set.all|yesno }}
+            </td>
+            <td>
+                {{ irp.name }}
+            </td>
+            <td>
+                {{ irp.base_dll_name }}
+            </td>
+            <td>
+                {% if arch == "x86" %}
+                    {{ irp.start|format_value:"[addrpad].Win7SP1x86" }}
+                {% else %}
+                    {{ irp.start|format_value:"[addrpad].Win7SP1x64" }}
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+</table>

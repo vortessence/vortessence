@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Vortessence - {% block title %}Automated Memory Forensics{% endblock %}</title>
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/dashboard.css' %}" rel="stylesheet">
+    <link href="{% static 'css/signin.css' %}" rel="stylesheet">
+</head>
+
+<body>
+
+<form id="login_form" class="form-signin" role="form" method="post" action="/login/">
+    <h2 class="form-signin-heading">Vortessence Login</h2>
+    {% csrf_token %}
+    <input type="username" class="form-control" placeholder="Username" name="username" required autofocus>
+    <input type="password" class="form-control" placeholder="Password" name="password" required>
+
+    <button class="btn btn-lg btn-primary btn-block" type="submit" value="submit">Login</button>
+
+</form>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="{% static 'js/jquery-2.1.0.min.js' %}"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+{% load static %}
+<div class="tabbable">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#tab_det_{{ wl_process.id }}" data-toggle="tab">Details</a></li>
+        <li>
+            <a href="#tab_dll_{{ wl_process.id }}" data-toggle="tab" value="{{ wl_process.id }}" class="ajax-link-fromajax"
+               view="w_dlls">DLLs</a>
+        </li>
+        <li>
+            <a href="#tab_ldrm_{{ wl_process.id }}" data-toggle="tab" value="{{ wl_process.id }}" class="ajax-link-fromajax"
+               view="w_ldrmodules">Ldrmodules</a>
+        </li>
+        <li>
+            <a href="#tab_hndl_{{ wl_process.id }}" data-toggle="tab" value="{{ wl_process.id }}" class="ajax-link-fromajax"
+               view="w_handles">Handles</a>
+        </li>
+        <li>
+            <a href="#tab_sid_{{ wl_process.id }}" data-toggle="tab" value="{{ wl_process.id }}" class="ajax-link-fromajax"
+               view="w_sids">SIDs</a>
+        </li>
+        <li>
+            <a href="#tab_con_{{ wl_process.id }}" data-toggle="tab" value="{{ wl_process.id }}" class="ajax-link-fromajax"
+               view="w_connections">Connections</a>
+        </li>
+        <li>
+            <a href="#tab_malfind_{{ wl_process.id }}" data-toggle="tab" value="{{ wl_process.id }}" class="ajax-link-fromajax"
+               view="w_malfinds">Malfind</a>
+        </li>
+        <li>
+            <a href="#tab_apihook_{{ wl_process.id }}" data-toggle="tab" view="w_apihooks" class="ajax-link-fromajax"
+               value="{{ wl_process.id }}">API hooks</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="tab_det_{{ wl_process.id }}">
+            <div class="bordered">
+                <table style="width: 100%">
+                    <tr>
+                        <th># instances</th>
+                        <th>#DLL range</th>
+                        <th>#Thread range</th>
+                        <th>Network</th>
+                    </tr>
+                    <tr>
+                        <td>{{ wl_process.nr }}</td>
+                        <td>{{ wl_process.dll_min }} - {{ wl_process.dll_max }}</td>
+                        <td>{{ wl_process.thread_min }} - {{ wl_process.thread_max }}</td>
+                        <td>{{ wl_process.network|yesno }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="bordered">
+                <strong>Command lines:</strong>
+                <ul>
+                    {% for cl in commandlines %}
+                        <li>{{ cl.cl }}{{ cl.cl_regex|default_if_none:"" }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="bordered">
+                <strong>Parents:</strong>
+                <ul>
+                    {% for parent in parents %}
+                        <li>{{ parent.wl_process_parent.name }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="bordered rcbottom">
+                <strong>Base priorities:</strong>&nbsp;
+                {% for prio in prios %}
+                    {{ prio.prio }}&nbsp;&nbsp;&nbsp;
+                {% endfor %}
+            </div>
+        </div>
+        <div class="tab-pane" id="tab_dll_{{ wl_process.id }}"></div>
+        <div class="tab-pane" id="tab_ldrm_{{ wl_process.id }}"></div>
+        <div class="tab-pane" id="tab_sid_{{ wl_process.id }}"></div>
+        <div class="tab-pane" id="tab_hndl_{{ wl_process.id }}"></div>
+        <div class="tab-pane" id="tab_con_{{ wl_process.id }}"></div>
+        <div class="tab-pane" id="tab_apihook_{{ wl_process.id }}"></div>
+        <div class="tab-pane" id="tab_malfind_{{ wl_process.id }}"></div>
+    </div>
+</div>
+<script src="{% static 'js/custom_ajax.js' %}"></script>

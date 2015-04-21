@@ -1,0 +1,22 @@
+{% extends 'web/ajax/ajax_base.html' %}
+{% load formatter %}
+{% block content %}
+    <table style="width: 100%" class="tablesorter tablesorter-bootstrap">
+        <thead>
+        <tr>
+            <th>Access</th>
+            <th class="filter-select">Type</th>
+            <th>Details</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for handle in wl_handles %}
+            <tr>
+                <td style="text-align: right">{{ handle.granted_access|format_value:"[addr]" }}</td>
+                <td>{{ handle.handle_type }}</td>
+                <td>{{ handle.handle_name }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

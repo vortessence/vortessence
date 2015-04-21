@@ -1,0 +1,24 @@
+{% extends 'web/ajax/ajax_base.html' %}
+{% load formatter %}
+{% block content %}
+    <table style="width: 100%" class="tablesorter tablesorter-bootstrap">
+        <thead>
+        <tr>
+            <th class="filter-select" style="width: 10%" {% if filter_anomalies %}data-value="yes"{% endif %}>
+                Anomaly
+            </th>
+            <th>SID</th>
+            <th>Name</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for sid in sids %}
+            <tr>
+                <td>{{ sid.detsid_set.all|yesno }}</td>
+                <td>{{ sid.sid }}</td>
+                <td>{{ sid.name }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

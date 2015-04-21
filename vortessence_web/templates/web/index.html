@@ -1,0 +1,28 @@
+{% extends 'web/base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block navbar %}
+    <li class="active"><a href="/">Overview</a></li>
+    <li><a href="/image/">Images</a></li>
+    <li><a href="/whitelist/">Whitelist</a></li>
+    <li><a href="/tools/">Tools</a></li>
+    <li><a href="/logout/">Logout</a></li>
+{% endblock %}
+
+{% block sidebar %}
+
+{% endblock %}
+
+{% block content %}
+    <h1 class="page-header">Overview</h1>
+    <h3>Images</h3>
+    List all images in the database and display the detection results if any.
+
+    <h3>Whitelist</h3>
+    Read only view of the whitelist values, grouped by Volatility plugin
+
+    <h3>Tools</h3>
+    View logs and manage users
+
+{% endblock %}

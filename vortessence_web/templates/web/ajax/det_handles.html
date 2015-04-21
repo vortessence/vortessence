@@ -1,0 +1,34 @@
+{% extends 'web/ajax/ajax_base.html' %}
+{% load formatter %}
+{% block content %}
+    <table style="width: 100%" class="tablesorter tablesorter-bootstrap">
+        <thead>
+        <tr>
+            <th class="filter-select" {% if filter_anomalies %}data-value="yes"{% endif %} >Anomaly</th>
+            <th>Offset (V)</th>
+            <th>Handle</th>
+            <th>Access</th>
+            <th class="filter-select">Type</th>
+            <th>Details</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for handle in handles %}
+            <tr>
+                <td>{{ handle.dethandle_set.all|yesno }}</td>
+                <td>
+                    {% if arch == "x86" %}
+                        {{ handle.offset|format_value:"[addrpad].Win7SP1x86" }}
+                    {% else %}
+                        {{ handle.offset|format_value:"[addrpad].Win7SP1x64" }}
+                    {% endif %}
+                </td>
+                <td style="text-align: right">{{ handle.handle_value|format_value:"[addr]"}}</td>
+                <td style="text-align: right">{{ handle.granted_access|format_value:"[addr]" }}</td>
+                <td>{{ handle.handle_type }}</td>
+                <td>{{ handle.handle_name }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

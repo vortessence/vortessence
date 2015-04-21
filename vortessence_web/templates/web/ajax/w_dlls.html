@@ -1,0 +1,23 @@
+{% extends 'web/ajax/ajax_base.html' %}
+{% load formatter %}
+{% block content %}
+    <table style="width: 100%; background-color: white; padding: 5px;" class="tablesorter tablesorter-bootstrap">
+        <thead>
+        <tr>
+            <th>Path</th>
+            <th>Size</th>
+            <th>Load count range</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for dll in wl_dlls %}
+            <tr>
+                <td>{{ dll.path }}</td>
+                <td>{{ dll.size|format_value:"[addr]" }}</td>
+                <td>{{ dll.load_count_from|format_value:"[addr]" }}
+                    - {{ dll.load_count_to|format_value:"[addr]" }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

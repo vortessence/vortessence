@@ -1,0 +1,51 @@
+/**
+ * Created by Beni Urech, beni@beniurech.ch on 4/21/14.
+ */
+
+.up_caret {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  vertical-align: middle;
+  border-bottom: 4px solid;
+  border-left: 4px solid transparent;
+  border-top: 0 dotted;
+  border-right: 4px solid transparent;
+}
+
+.diff {
+    width: 100%;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.diff_chg {
+    background-color: lightcoral;
+}
+
+.diff_sub {
+    background-color: lightcoral;
+}
+
+.diff_add {
+    background-color: lightcoral;
+}
+
+.bordered {
+    border: 1px solid #dddddd;
+    border-top: none;
+    background-color: #ffffff;
+    padding: 10px 15px;
+}
+
+.rctop {
+    border-radius: 4px 4px 0 0;
+}
+
+.rcbottom {
+    border-radius: 0 0 4px 4px;
+}
+
+.rcall{
+    border-radius: 4px 4px 4px 4px;
+}

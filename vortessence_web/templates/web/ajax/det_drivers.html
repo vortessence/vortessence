@@ -1,0 +1,138 @@
+{% extends 'web/ajax/ajax_base.html' %}
+{% load formatter %}
+{% block content %}
+    <div class="modal fade" id="det_driver_modal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width: 1200px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body" id="det_driver_body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <table style="width: 100%;" class="tablesorter tablesorter-bootstrap">
+        <thead>
+        <tr>
+            <th class="filter-select" {% if filter_anomalies %}data-value="yes"{% endif %} >
+                Anomaly
+            </th>
+            <th class="filter-select" style="width: 10%">
+                IRP anomalies
+            </th>
+            <th class="filter-select">
+                Dev anomalies
+            </th>
+            <th>
+                Name
+            </th>
+            <th>
+                Start
+            </th>
+            <th>
+                Start IO
+            </th>
+            <th>
+                Size
+            </th>
+        </tr>
+        </thead>
+        {% for driver in drivers %}
+            <tr>
+                <td>
+                    {{ driver.hasDriverAnomaly|yesno }}
+                </td>
+                <td style="width: 10%">
+                    <a href="#" class="load_det_modal" view="det_irps"
+                       value="{{ driver.driver.id }}">{{ driver.hasIrpCallAnomalies|yesno }}</a>
+                </td>
+                <td>
+                    {{ driver.hasDeviceAnomaly|yesno }}
+                </td>
+                <td>
+                    {{ driver.driver.name }}
+                </td>
+                <td>
+                    {% if arch == "x86" %}
+                        {{ driver.driver.start|format_value:"[addrpad].Win7SP1x86" }}
+                    {% else %}
+                        {{ driver.driver.start|format_value:"[addrpad].Win7SP1x64" }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if arch == "x86" %}
+                        {{ driver.driver.start_io|format_value:"[addrpad].Win7SP1x86" }}
+                    {% else %}
+                        {{ driver.driver.start_io|format_value:"[addrpad].Win7SP1x64" }}
+                    {% endif %}
+                </td>
+                <td>
+                    {{ driver.driver.size|format_value:"[addr].Win7SP186" }}
+                </td>
+            </tr>
+
+            {% for device in driver.devices %}
+                <tr class="tablesorter-childRow" style="background-color: lightgray">
+                    <td>&nbsp;</td>
+                    <td>
+                        {% if device.parent_device %}
+                            {% if device.level == 0 %}
+                                --ATT
+                            {% elif device.level == 1 %}
+                                ----ATT
+                            {% elif device.level == 2 %}
+                                ------ATT
+                            {% else %}
+                                --------ATT
+                            {% endif %}
+                        {% else %}
+                            DEV
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ device.detdevice_set.all|yesno }}
+                    </td>
+                    <td>
+                        {% if arch == "x86" %}
+                            {{ device.offset|format_value:"[addrpad].Win7SP1x86" }}
+                        {% else %}
+                            {{ device.offset|format_value:"[addrpad].Win7SP1x64" }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ device.name }}
+                    </td>
+                    <td colspan=2>
+                        {{ device.type }}
+                    </td>
+                </tr>
+            {% endfor %}
+        {% endfor %}
+        <?php } ?>
+    </table>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".load_det_modal").click(function (event) {
+                event.preventDefault();
+                var elem_id;
+                var view;
+                elem_id = $(this).attr("value");
+                view = $(this).attr("view");
+                var link = $(this);
+                $('#det_driver_body').html("Loading...")
+                $('#det_driver_body').load('/ajax/' + view + '/' + elem_id, function (result) {
+                    $('#det_driver_modal').modal({show: true});
+                });
+            })
+        });
+    </script>
+{% endblock %}

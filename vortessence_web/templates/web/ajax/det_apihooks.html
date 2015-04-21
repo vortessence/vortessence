@@ -1,0 +1,59 @@
+{% extends 'web/ajax/ajax_base.html' %}
+{% load formatter %}
+{% block content %}
+    <table style="width: 100%" class="tablesorter tablesorter-bootstrap">
+        <thead>
+        <tr>
+            <th class="filter-select" {% if filter_anomalies %}data-value="yes"{% endif %} >Anomaly</th>
+            <th class="filter-select">Mode</th>
+            <th>Address</th>
+            <th class="filter-select">Hook type</th>
+            <th>Victim module</th>
+            <th>Hooking module</th>
+            <th>Function</th>
+        </tr>
+        </thead>
+        {% for apihook in apihooks %}
+            <tr>
+                <td>{{ apihook.detapihook_set.all|yesno }}</td>
+                <td>{{ apihook.hook_mode }}</td>
+                <td>
+                    {% if arch == "x86" %}
+                        {{ apihook.hook_address|format_value:"[addrpad].Win7SP1x86" }}
+                    {% else %}
+                        {{ apihook.hook_address|format_value:"[addrpad].Win7SP1x64" }}
+                    {% endif %}
+                </td>
+                <td>{{ apihook.hook_type }}</td>
+                <td>{{ apihook.dll.path }}</td>
+                <td>{{ apihook.hooking_module }}</td>
+                <td><a href="#" class="show_apihook{{ process.id }}">{{ apihook.function|truncatechars:70 }}</a></td>
+            </tr>
+            <tr style="display:none; font-family: 'Courier New'" class="tablesorter-childRow">
+                <td colspan="7">
+                    Hook mode: {{ apihook.hook_mode }}<br/>
+                    Hook type: {{ apihook.hook_type }}<br/>
+                    Victim module: {{ apihook.dll.path }}<br/>
+                    Function: {{ apihook.function }}<br/>
+                    Hook address:
+                    {% if arch == "x86" %}
+                        {{ apihook.hook_address|format_value:"[addrpad].Win7SP1x86" }}
+                    {% else %}
+                        {{ apihook.hook_address|format_value:"[addrpad].Win7SP1x64" }}
+                    {% endif %}
+                    <br/>
+                    Hooking module: {{ apihook.hooking_module }}<br/><br/>
+                    {{ apihook.disassembly|linebreaks }}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".show_apihook{{ process.id }}").click(function () {
+                $(this).parent().parent().next().toggle();
+                return false;
+            })
+        })
+    </script>
+{% endblock %}

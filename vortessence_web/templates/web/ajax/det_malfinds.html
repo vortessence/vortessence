@@ -1,0 +1,116 @@
+{% load formatter %}
+{% if malfind_true_positives %}
+    <div style="margin-left:10px; margin-top: 5px;">
+        <h4>{{ malfind_true_positives|length }}
+            malfind detections</h4>
+
+        {% for w_malfind in malfind_true_positives %}
+            <table style="width: 100%;" class="table table-striped table-bordered">
+                <tr>
+                    <th>Address</th>
+                    <td>
+                        {% if arch == "x86" %}
+                            {{ w_malfind.malfind.start_address|format_value:"[addrpad].Win7SP1x86" }} -
+                            {{ w_malfind.malfind.end_address|format_value:"[addrpad].Win7SP1x86" }}
+                        {% else %}
+                            {{ w_malfind.malfind.start_address|format_value:"[addrpad].Win7SP1x64" }} -
+                            {{ w_malfind.malfind.end_address|format_value:"[addrpad].Win7SP1x64" }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>VAD</th>
+                    <td>{{ w_malfind.malfind.vad }}</td>
+                </tr>
+                <tr>
+                    <th>Protection</th>
+                    <td>{{ w_malfind.malfind.protection }}</td>
+                </tr>
+                <tr>
+                    <th>Flags</th>
+                    <td>{{ w_malfind.malfind.flags }}</td>
+                </tr>
+                <tr>
+                    <th>Detection reason</th>
+                    <td>{{ w_malfind.reason }}</td>
+                </tr>
+                <tr>
+                    <th>Content<br/><br/><a href="#" class="expand_mf_{{ pid }} btn btn-sm btn-info">Show assembler</a></th>
+                    <td colspan="2" style="font-family: 'Courier New'">
+                        {{ w_malfind.malfind.hex_output|linebreaks }}
+                    </td>
+                </tr>
+                <tr style="display: none; font-family: 'Courier New'">
+                    <th>Assembler</th>
+                    <td>
+                        {{ w_malfind.malfind.disasm_output|linebreaks }}
+                    </td>
+                </tr>
+            </table>
+        {% endfor %}
+
+        <hr/>
+    </div>
+{% endif %}
+
+<div style="margin-left:10px; margin-top: 5px;">
+    {% if malfind_false_positives %}
+        <h4>{{ malfind_false_positives|length }}
+            malfind potential false positives</h4>
+        {% for w_malfind in malfind_false_positives %}
+            <table style="width: 100%;" class="table table-striped table-bordered">
+                <tr>
+                    <th>Address</th>
+                    <td>
+                        {% if arch == "x86" %}
+                            {{ w_malfind.malfind.start_address|format_value:"[addrpad].Win7SP1x86" }} -
+                            {{ w_malfind.malfind.end_address|format_value:"[addrpad].Win7SP1x86" }}
+                        {% else %}
+                            {{ w_malfind.malfind.start_address|format_value:"[addrpad].Win7SP1x64" }} -
+                            {{ w_malfind.malfind.end_address|format_value:"[addrpad].Win7SP1x64" }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>VAD</th>
+                    <td>{{ w_malfind.malfind.vad }}</td>
+                </tr>
+                <tr>
+                    <th>Protection</th>
+                    <td>{{ w_malfind.malfind.protection }}</td>
+                </tr>
+                <tr>
+                    <th>Flags</th>
+                    <td>{{ w_malfind.malfind.flags }}</td>
+                </tr>
+                <tr>
+                    <th>Classification reason</th>
+                    <td>Process is known to have READ_WRITE_EXECUTE VADs with this size</td>
+                </tr>
+                <tr>
+                    <th>Content<br/><br/><a href="#" class="expand_mf_{{ pid }} btn btn-sm btn-info">Show assembler</a></th>
+                    <td colspan="2" style="font-family: 'Courier New'">
+                        {{ w_malfind.malfind.hex_output|linebreaks }}
+                    </td>
+                </tr>
+                <tr style="display: none; font-family: 'Courier New'">
+                    <th>Assembler</th>
+                    <td>
+                        {{ w_malfind.malfind.disasm_output|linebreaks }}
+                    </td>
+                </tr>
+            </table>
+        {% endfor %}
+        <hr/>
+    {% endif %}
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".expand_mf_{{ pid }}").click(function () {
+            $(this).parent().parent().next().toggle();
+            var text = $(this).html()
+            $(this).html(text == "Show assembler" ? "Hide assembler" : "Show assembler");
+            return false;
+        })
+    });
+</script>

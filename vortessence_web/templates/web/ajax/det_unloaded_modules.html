@@ -1,0 +1,53 @@
+{% extends 'web/ajax/ajax_base.html' %}
+{% load formatter %}
+{% block content %}
+
+    <table style="width: 100%" class="tablesorter tablesorter-bootstrap">
+        <thead>
+        <tr>
+            <th class="filter-select" {% if filter_anomalies %}data-value="yes"{% endif %} >
+                Anomaly
+            </th>
+            <th>
+                Name
+            </th>
+            <th>
+                Start address
+            </th>
+            <th>
+                End address
+            </th>
+            <th>
+                Time
+            </th>
+        </tr>
+        </thead>
+        {% for unloaded_module in unloaded_modules %}
+            <tr>
+                <td>
+                    {{ unloaded_module.detunloadedmodules_set.all|yesno }}
+                </td>
+                <td>
+                    {{ unloaded_module.name }}
+                </td>
+                <td>
+                    {% if arch == "x86" %}
+                        {{ unloaded_module.start_address|format_value:"[addrpad].Win7SP1x86" }}
+                    {% else %}
+                        {{ unloaded_module.start_address|format_value:"[addrpad].Win7SP1x64" }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if arch == "x86" %}
+                        {{ unloaded_module.end_address|format_value:"[addrpad].Win7SP1x86" }}
+                    {% else %}
+                        {{ unloaded_module.end_address|format_value:"[addrpad].Win7SP1x64" }}
+                    {% endif %}
+                </td>
+                <td>
+                    {{ unloaded_module.time }}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

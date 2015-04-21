@@ -1,0 +1,207 @@
+{% extends 'web/base.html' %}
+{% load i18n %}
+{% load formatter %}
+{% block title %}Service whitelist{% endblock %}
+
+{% block navbar %}
+{#    <li><a href="/">Overview</a></li>#}
+    <li><a href="/image/">Images</a></li>
+    <li class="active"><a href="/whitelist/">Whitelist</a></li>
+    <li><a href="/tools/">Tools</a></li>
+    <li><a href="/logout/">Logout</a></li>
+{% endblock %}
+
+{% block sidebar %}
+    <ul class="nav nav-sidebar">
+        <li><a href="/whitelist">Overview</a></li>
+        <li><a href="/whitelist/processes">Processes</a></li>
+        <li><a href="/whitelist/callbacks">Callbacks</a></li>
+        <li><a href="/whitelist/drivers">Drivers</a></li>
+        <li><a href="/whitelist/files">Files</a></li>
+        <li><a href="/whitelist/gdts">GDTs</a></li>
+        <li><a href="/whitelist/idts">IDTs</a></li>
+        <li><a href="/whitelist/modules">Kernel modules</a></li>
+        <li><a href="/whitelist/unloadedmodules">unl. kernel modules</a></li>
+        <li><a href="/whitelist/registry">Registry</a></li>
+        <li class="active"><a href="/whitelist/services">Services</a></li>
+        <li><a href="/whitelist/ssdts">SSDTs</a></li>
+        <li><a href="/whitelist/timers">Timers</a></li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <h1 class="page-header">Service whitelist</h1>
+    <table>
+        <thead>
+        <tr>
+            <td style="width: 60%">
+                <form id="wl_callback_search_form" class="navbar-form form-right" action="/whitelist/services/"
+                      method="get">
+                    <input type="text" name="q" id="q" value="{{ search_value }}" class="form-control"
+                           placeholder="Search in service attributes and profile" style="width: 400px;"/>
+                    <button class="btn btn-primary" type="submit" value="submit">Search
+                    </button>
+                </form>
+            </td>
+            <td style="width: 40%">
+                <div style="margin: 15px; text-align: right; font-weight: bold;">
+                    {{ page_obj.paginator.count }} Services found
+                </div>
+            </td>
+        </tr>
+        </thead>
+    </table>
+    <div>
+        {% if is_paginated %}
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li>
+                        <a href="?o={{ sort_by }}&ot={{ sort_mode_pag }}&q={{ search_value }}&page={{ page_obj.previous_page_number }}">&laquo;</a>
+                    </li>
+                {% else %}
+                    <li class="disabled"><a href="#">&laquo;</a></li>
+                {% endif %}
+
+                {% for page in page_obj.pages %}
+                    {% if page %}
+                        {% ifequal page page_obj.number %}
+                            <li class="active"><a href="#">{{ page }}<span class="sr-only">(current)</span></a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="?o={{ sort_by }}&ot={{ sort_mode_pag }}&q={{ search_value }}&page={{ page }}">{{ page }}</a>
+                            </li>
+                        {% endifequal %}
+                    {% else %}
+                        <li><span>...</span></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li>
+                        <a href="?o={{ sort_by }}&ot={{ sort_mode_pag }}&q={{ search_value }}&page={{ page_obj.next_page_number }}">&raquo;</a>
+                    </li>
+                {% else %}
+                    <li class="disabled"><a href="#">&raquo;</a></li>
+                {% endif %}
+            </ul>
+        {% endif %}
+    </div>
+
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th style="width: 10%">
+                    <a href="/whitelist/services/?o=name&ot={{ sort_mode }}&q={{ search_value }}">Name</a>
+                    {% if sort_by == 'name' %}
+                        {% if sort_mode == 'asc' %}
+                            <span class="caret"></span>
+                        {% else %}
+                            <span class="up_caret"></span>
+                        {% endif %}
+                    {% endif %}
+                </th>
+                <th style="width: 20%">
+                    <a href="/whitelist/services/?o=type&ot={{ sort_mode }}&q={{ search_value }}">Type</a>
+                    {% if sort_by == 'type' %}
+                        {% if sort_mode == 'asc' %}
+                            <span class="caret"></span>
+                        {% else %}
+                            <span class="up_caret"></span>
+                        {% endif %}
+                    {% endif %}
+                </th>
+                <th style="width: 20%">
+                    <a href="/whitelist/services/?o=binary_path&ot={{ sort_mode }}&q={{ search_value }}">Binary path</a>
+                    {% if sort_by == 'binary_path' %}
+                        {% if sort_mode == 'asc' %}
+                            <span class="caret"></span>
+                        {% else %}
+                            <span class="up_caret"></span>
+                        {% endif %}
+                    {% endif %}
+                </th>
+                <th style="width: 20%">
+                    <a href="/whitelist/services/?o=dll&ot={{ sort_mode }}&q={{ search_value }}">DLL</a>
+                    {% if sort_by == 'dll' %}
+                        {% if sort_mode == 'asc' %}
+                            <span class="caret"></span>
+                        {% else %}
+                            <span class="up_caret"></span>
+                        {% endif %}
+                    {% endif %}
+                </th>
+                <th style="width: 15%">
+                    <a href="/whitelist/services/?o=wl_process__name&ot={{ sort_mode }}&q={{ search_value }}">Process</a>
+                    {% if sort_by == 'wl_process__name' %}
+                        {% if sort_mode == 'asc' %}
+                            <span class="caret"></span>
+                        {% else %}
+                            <span class="up_caret"></span>
+                        {% endif %}
+                    {% endif %}
+                </th>
+                <th style="width: 15%">
+                    <a href="/whitelist/services/?o=profile__name&ot={{ sort_mode }}&q={{ search_value }}">Profile</a>
+                    {% if sort_by == 'profile__name' %}
+                        {% if sort_mode == 'asc' %}
+                            <span class="caret"></span>
+                        {% else %}
+                            <span class="up_caret"></span>
+                        {% endif %}
+                    {% endif %}
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for wl_service in wlservice_list %}
+                <tr>
+                    <td>{{ wl_service.name }}</td>
+                    <td>{{ wl_service.type }}</td>
+                    <td>{{ wl_service.binary_path }}</td>
+                    <td>{{ wl_service.dll }}</td>
+                    <td>{{ wl_service.wl_process.name }}</td>
+                    <td>{{ wl_service.profile.name }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% if is_paginated %}
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li>
+                        <a href="?o={{ sort_by }}&ot={{ sort_mode_pag }}&q={{ search_value }}&page={{ page_obj.previous_page_number }}">&laquo;</a>
+                    </li>
+                {% else %}
+                    <li class="disabled"><a href="#">&laquo;</a></li>
+                {% endif %}
+
+                {% for page in page_obj.pages %}
+                    {% if page %}
+                        {% ifequal page page_obj.number %}
+                            <li class="active"><a href="#">{{ page }}<span class="sr-only">(current)</span></a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="?o={{ sort_by }}&ot={{ sort_mode_pag }}&q={{ search_value }}&page={{ page }}">{{ page }}</a>
+                            </li>
+                        {% endifequal %}
+                    {% else %}
+                        <li><span>...</span></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li>
+                        <a href="?o={{ sort_by }}&ot={{ sort_mode_pag }}&q={{ search_value }}&page={{ page_obj.next_page_number }}">&raquo;</a>
+                    </li>
+                {% else %}
+                    <li class="disabled"><a href="#">&raquo;</a></li>
+                {% endif %}
+            </ul>
+        {% endif %}
+    </div>
+
+{% endblock %}
