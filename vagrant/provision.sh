@@ -58,7 +58,10 @@ mkdir -p /vagrant/data/target
 
 ## Initialize DB
 mysql -u root --password=toor < /vagrant/vagrant/create_db_user.sql
+python /vagrant/vortessence/manage.py makemigrations
 python /vagrant/vortessence/manage.py migrate
+python /vagrant/vortessence/manage.py makemigrations vortessence
+python /vagrant/vortessence/manage.py migrate vortessence
 mysql -u root --password=toor < /vagrant/vagrant/insert_db_profiles.sql
 
 ## Link scripts to path

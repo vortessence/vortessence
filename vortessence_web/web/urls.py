@@ -16,10 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from web import views
 
-urlpatterns = patterns('',
+urlpatterns = [
                        url(r'^$', views.index, name='dashboard'),
                        url(r'^login/$', views.user_login, name='login'),
                        url(r'^logout/$', views.user_logout, name='logout'),
@@ -48,4 +48,4 @@ urlpatterns = patterns('',
                        url(r'^whitelist/timers/$', views.WhitelistTimerListView.as_view(), name="whitelist_timers"),
                        url(r'^whitelist/registry/$', views.WhitelistRegistryListView.as_view(),
                            name="whitelist_registry"),
-)
+]

@@ -16,10 +16,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from web import ajax_views
 
-urlpatterns = patterns('',
+urlpatterns = [
                        url(r'^det_dlls/(?P<process_id>\d+)$', ajax_views.det_dlls, name='det_dlls'),
                        url(r'^det_sids/(?P<process_id>\d+)$', ajax_views.det_sids, name='det_sids'),
                        url(r'^det_ldrmodules/(?P<process_id>\d+)$', ajax_views.det_ldrmodules, name='det_ldrmodules'),
@@ -54,4 +54,4 @@ urlpatterns = patterns('',
                        url(r'^w_proc_details/(?P<wl_process_id>\d+)$', ajax_views.w_proc_details, name='w_dlls'),
                        url(r'^w_irps/(?P<wl_driver_id>\d+)$', ajax_views.w_irps, name='w_irps'),
 
-)
+]
